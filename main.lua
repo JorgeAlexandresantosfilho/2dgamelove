@@ -8,7 +8,7 @@ local estado_jogo = "menu"
 local estado_anterior = "jogando" 
 local nivel_atual = 1
 local pontuacao_atual = 0
-local alvo_nivel = 200 -- BALANCEAMENTO: Blind 1 mais fácil
+local alvo_nivel = 200 
 
 -- LIMITES DA RODADA
 local maos_restantes = 4
@@ -26,7 +26,7 @@ local painel_w = 260
 local sfx_selecionar, musica_fundo
 
 -- ==========================================
--- SISTEMA DE CACHE E PRÉ-LOAD (FIM DO LAG)
+-- SISTEMA DE CACHE E PRÉ-LOAD
 -- ==========================================
 local cache_fontes = {}
 function getFonte(tamanho)
@@ -43,7 +43,6 @@ function love.load()
     love.window.setMode(1280, 720, {resizable=false})
     math.randomseed(os.time())
     
-    -- PRÉ-CARREGANDO AS FONTES: O jogo já liga com tudo na memória, zero lag nos menus.
     local tamanhos = {12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 40, 48, 60, 80}
     for _, tam in ipairs(tamanhos) do getFonte(tam) end
     
@@ -80,7 +79,6 @@ end
 
 function gerarLoja()
     loja_itens = {}
-    -- BALANCEAMENTO: Jokers mais fortes
     local banco_de_jokers = {
         { nome = "Coringa Adição", desc = "+30 Fichas Finais", preco = 4, tipo = "fichas", valor = 30 },
         { nome = "Coringa Fator", desc = "+4 Mult Final", preco = 6, tipo = "mult", valor = 4 },
@@ -131,16 +129,13 @@ function love.update(dt)
     end
 end
 
--- ==========================================
--- HITBOXES CORRIGIDAS (Nenhum "Falso Congelamento")
--- ==========================================
 function love.mousepressed(x, y, button)
     if button ~= 1 then return end
-    
-    local centro_x = 630 -- Variável para alinhar os botões grandes do centro da tela
 
     if estado_jogo == "menu" then
-        if x >= centro_x and x <= centro_x + 280 and y >= 350 and y <= 430 then
+        -- Botão INICIAR centralizado na tela cheia (1280 / 2 - 280 / 2 = 500)
+        local menu_btn_x = 500
+        if x >= menu_btn_x and x <= menu_btn_x + 280 and y >= 350 and y <= 430 then
             if sfx_selecionar then sfx_selecionar:clone():play() end
             iniciarNivel(true)
         end
@@ -194,19 +189,21 @@ function love.mousepressed(x, y, button)
         end
 
     elseif estado_jogo == "guia" then
-        -- HITBOX CORRIGIDA AQUI!
         local btn_x = 650
         if x >= btn_x and x <= btn_x + 240 and y >= 550 and y <= 600 then 
             estado_jogo = estado_anterior 
         end
 
     elseif estado_jogo == "venceu_nivel" then
+        -- Centralizado para o espaço de jogo com painel (630)
+        local centro_x = 630
         if x >= centro_x and x <= centro_x + 280 and y >= 400 and y <= 460 then
             gerarLoja()
             estado_jogo = "loja"
         end
         
     elseif estado_jogo == "loja" then
+        local centro_x = 630
         local inicio_loja_x = 440
         for i, item in ipairs(loja_itens) do
             local ix = inicio_loja_x + (i - 1) * 220
@@ -222,11 +219,12 @@ function love.mousepressed(x, y, button)
         end
         if x >= centro_x and x <= centro_x + 280 and y >= 550 and y <= 610 then
             nivel_atual = nivel_atual + 1
-            alvo_nivel = math.floor(alvo_nivel * 1.8) -- Aumenta menos agressivamente
+            alvo_nivel = math.floor(alvo_nivel * 1.8) 
             iniciarNivel(false)
         end
 
     elseif estado_jogo == "game_over" then
+        local centro_x = 630
         if x >= centro_x and x <= centro_x + 280 and y >= 400 and y <= 460 then iniciarNivel(true) end
     end
 end
@@ -261,7 +259,7 @@ function avaliarEJogar()
     maos_restantes = maos_restantes - 1
 
     local mult = 1
-    local fichas_base_mao = 10 -- BALANCEAMENTO: Carta alta agora dá 10 base
+    local fichas_base_mao = 10 
     ultima_jogada_nome = "Carta Alta"
     
     local todos_pares, todos_impares, todos_primos = true, true, true
@@ -273,7 +271,6 @@ function avaliarEJogar()
         if not primos[carta.valor] then todos_primos = false end
     end
 
-    -- BALANCEAMENTO APLICADO
     if todos_primos and #cartas_jogadas >= 2 then
         ultima_jogada_nome = "Conjunto Primo"
         fichas_base_mao = 40
@@ -307,19 +304,20 @@ end
 function love.draw()
     love.graphics.setBackgroundColor(0.15, 0.35, 0.20)
     
-    local centro_x = 630 -- Centraliza botões longos
-
     if estado_jogo == "menu" then
+        local menu_btn_x = 500 -- Botão de menu na tela inteira
         love.graphics.setColor(1, 1, 1)
         love.graphics.setFont(getFonte(80))
         love.graphics.printf("ALGEBRATRO", 0, 150, 1280, "center")
         love.graphics.setColor(0.9, 0.6, 0.1)
-        love.graphics.rectangle("fill", centro_x, 350, 280, 80, 15)
+        love.graphics.rectangle("fill", menu_btn_x, 350, 280, 80, 15)
         love.graphics.setColor(0, 0, 0)
         love.graphics.setFont(getFonte(32))
-        love.graphics.printf("INICIAR", centro_x, 370, 280, "center")
+        love.graphics.printf("INICIAR", menu_btn_x, 370, 280, "center")
         return
     end
+
+    local centro_x = 630 -- Variável para as telas com o painel lateral
 
     love.graphics.setColor(0.18, 0.18, 0.18) 
     love.graphics.rectangle("fill", 0, 0, painel_w, 720)
