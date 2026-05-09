@@ -133,7 +133,6 @@ function love.mousepressed(x, y, button)
     if button ~= 1 then return end
 
     if estado_jogo == "menu" then
-        -- Botão INICIAR centralizado na tela cheia (1280 / 2 - 280 / 2 = 500)
         local menu_btn_x = 500
         if x >= menu_btn_x and x <= menu_btn_x + 280 and y >= 350 and y <= 430 then
             if sfx_selecionar then sfx_selecionar:clone():play() end
@@ -195,7 +194,6 @@ function love.mousepressed(x, y, button)
         end
 
     elseif estado_jogo == "venceu_nivel" then
-        -- Centralizado para o espaço de jogo com painel (630)
         local centro_x = 630
         if x >= centro_x and x <= centro_x + 280 and y >= 400 and y <= 460 then
             gerarLoja()
@@ -305,7 +303,7 @@ function love.draw()
     love.graphics.setBackgroundColor(0.15, 0.35, 0.20)
     
     if estado_jogo == "menu" then
-        local menu_btn_x = 500 -- Botão de menu na tela inteira
+        local menu_btn_x = 500 
         love.graphics.setColor(1, 1, 1)
         love.graphics.setFont(getFonte(80))
         love.graphics.printf("ALGEBRATRO", 0, 150, 1280, "center")
@@ -317,7 +315,7 @@ function love.draw()
         return
     end
 
-    local centro_x = 630 -- Variável para as telas com o painel lateral
+    local centro_x = 630 
 
     love.graphics.setColor(0.18, 0.18, 0.18) 
     love.graphics.rectangle("fill", 0, 0, painel_w, 720)
@@ -384,16 +382,18 @@ function love.draw()
 
     if estado_jogo == "jogando" or estado_jogo == "pause" or estado_jogo == "guia" then
         
+        -- AJUSTE VISUAL DO JOKER APLICADO AQUI
         local jx_inicio = painel_w + 20
         for i, joker in ipairs(jokers_ativos) do
-            local jx = jx_inicio + (i - 1) * 110
+            local jx = jx_inicio + (i - 1) * 130
             love.graphics.setColor(0.3, 0.3, 0.3)
-            love.graphics.rectangle("fill", jx, 20, 100, 80, 5)
+            love.graphics.rectangle("fill", jx, 15, 120, 90, 5)
             love.graphics.setColor(1, 1, 1)
             love.graphics.setFont(getFonte(14))
-            love.graphics.printf(joker.nome, jx, 30, 100, "center")
+            love.graphics.printf(joker.nome, jx, 20, 120, "center")
             love.graphics.setColor(0.9, 0.7, 0.1)
-            love.graphics.printf(joker.desc, jx, 50, 100, "center")
+            love.graphics.setFont(getFonte(12))
+            love.graphics.printf(joker.desc, jx, 55, 120, "center")
         end
 
         love.graphics.setColor(1, 1, 1)
