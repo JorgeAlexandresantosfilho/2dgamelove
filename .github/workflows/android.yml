@@ -1,0 +1,33 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Make gradlew executable
+      run: chmod +x android/gradlew
+
+    - name: Build APK
+      working-directory: ./android
+      run: ./gradlew assembleNormal
+
+    - name: Upload APKs
+      uses: actions/upload-artifact@v3
+      with:
+        name: 2DGameLove-Android-APK
+        path: android/app/build/outputs/apk/**/*.apk
