@@ -20,22 +20,22 @@ jobs:
         java-version: '17'
 
     - name: Clone love-android with submodules
-      run: git clone --recurse-submodules --depth 1 https://github.com/love2d/love-android.git ~/love-android
+      run: git clone --recurse-submodules --depth 1 https://github.com/love2d/love-android.git love-android
 
     - name: Package game.love
       run: |
-        mkdir -p ~/love-android/app/src/main/assets
-        zip -9 -r ~/love-android/app/src/main/assets/game.love . -x "build/*" -x ".git/*" -x ".github/*" -x "android/*"
+        mkdir -p love-android/app/src/main/assets
+        zip -9 -r love-android/app/src/main/assets/game.love . -x "build/*" -x ".git/*" -x ".github/*" -x "love-android/*"
 
     - name: Configure App Name and Package ID
       run: |
         # Customize gradle.properties in love-android
-        sed -i 's/#app.name=LÖVE for Android/app.name=2D Game Love/g' ~/love-android/gradle.properties
-        sed -i 's/app.name_byte_array=/#app.name_byte_array=/g' ~/love-android/gradle.properties
-        sed -i 's/app.application_id=org.love2d.android/app.application_id=com.jorge.gamelove/g' ~/love-android/gradle.properties
+        sed -i 's/#app.name=LÖVE for Android/app.name=2D Game Love/g' love-android/gradle.properties
+        sed -i 's/app.name_byte_array=/#app.name_byte_array=/g' love-android/gradle.properties
+        sed -i 's/app.application_id=org.love2d.android/app.application_id=com.jorge.gamelove/g' love-android/gradle.properties
 
     - name: Build APK
-      working-directory: ~/love-android
+      working-directory: ./love-android
       run: |
         chmod +x gradlew
         ./gradlew assembleNormal
@@ -44,4 +44,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: 2DGameLove-Android-APK
-        path: ~/love-android/app/build/outputs/apk/**/*.apk
+        path: love-android/app/build/outputs/apk/**/*.apk
